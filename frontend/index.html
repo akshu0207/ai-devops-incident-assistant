@@ -1,0 +1,581 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080b14" />
+  <title>Nexus | AI DevOps Intelligence</title>
+  <style>
+    :root {
+      --bg: #080b14;
+      --panel: #101522;
+      --panel2: #151b2b;
+      --border: #252d40;
+      --text: #f0f3ff;
+      --muted: #8993ab;
+      --purple: #8b7cff;
+      --cyan: #55d6e8;
+      --green: #43d9a3;
+      --red: #ff6482;
+      --yellow: #ffca72;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at 80% -20%, #24204c 0, transparent 42%), var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+    }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .app { display: flex; min-height: 100vh; }
+    aside {
+      width: 244px; flex-shrink: 0; padding: 27px 17px;
+      background: rgba(10,14,25,.92); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 28px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 0 9px; }
+    .brand-icon {
+      width: 40px; height: 40px; border-radius: 13px;
+      background: linear-gradient(140deg,#9c83ff,#5a48dc);
+      display: grid; place-items: center; font-size: 21px;
+      box-shadow: 0 0 28px #7764ff30;
+    }
+    .brand h1 { margin: 0; font-size: 18px; letter-spacing: 2px; }
+    .brand small { display: block; margin-top: 4px; font-size: 9px; letter-spacing: 1.5px; color: #a99bff; }
+    .nav-label { color: #68738c; font-size: 10px; letter-spacing: 1.8px; padding: 0 12px; margin-bottom: 10px; }
+    .nav { display: grid; gap: 6px; }
+    .nav button {
+      border: 1px solid transparent; background: transparent; color: #929bb2;
+      text-align: left; padding: 12px 13px; border-radius: 10px;
+      display: flex; align-items: center; gap: 12px; transition: .2s;
+    }
+    .nav button:hover, .nav button.active {
+      color: white; background: linear-gradient(100deg,#8b7cff20,#8b7cff08);
+      border-color: #8b7cff35;
+    }
+    .nav .ico { width: 20px; text-align: center; font-size: 17px; }
+    .side-bottom { margin-top: auto; }
+    .status-card { border: 1px solid var(--border); background: #111726; padding: 14px; border-radius: 12px; }
+    .status-dot { display: inline-block; width: 7px; height: 7px; background: var(--yellow); border-radius: 50%; margin-right: 7px; }
+    .status-dot.online { background: var(--green); box-shadow: 0 0 9px #43d9a370; }
+    .status-card p { color: var(--muted); font-size: 11px; line-height: 1.7; margin: 9px 0 0; }
+    main { min-width: 0; flex: 1; padding: 30px clamp(18px,4vw,54px); max-width: 1700px; margin: 0 auto; width: 100%; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 36px; }
+    .crumb { color: var(--muted); font-size: 12px; }
+    .crumb span { color: var(--text); }
+    .profile { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 36px; height: 36px; border-radius: 12px; background: #292345; display: grid; place-items: center; color: #c9beff; font-weight: 700; }
+    .profile small { display: block; color: var(--muted); margin-top: 3px; }
+    .eyebrow { color: #a99bff; letter-spacing: 2px; font-size: 10px; font-weight: 700; margin-bottom: 10px; }
+    h2 { font-size: clamp(26px,3vw,36px); letter-spacing: -1.2px; margin: 0; }
+    .subtitle { color: var(--muted); line-height: 1.7; margin: 11px 0 0; max-width: 640px; }
+    .hero { display: flex; justify-content: space-between; gap: 20px; align-items: flex-end; margin-bottom: 28px; }
+    .btn {
+      border: 1px solid var(--border); border-radius: 10px; padding: 11px 16px;
+      color: var(--text); background: #171d2d; transition: .2s;
+    }
+    .btn:hover { border-color: #8272f5; transform: translateY(-1px); }
+    .btn.primary { background: linear-gradient(110deg,#8c78ff,#6552e8); border: 0; font-weight: 650; box-shadow: 0 6px 22px #725dff2b; }
+    .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+    .metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 15px; margin-bottom: 23px; }
+    .metric, .panel { background: linear-gradient(145deg,#121827,#0f1421); border: 1px solid var(--border); border-radius: 15px; }
+    .metric { padding: 19px; position: relative; overflow: hidden; }
+    .metric:after { content: ""; position: absolute; right: -28px; top: -30px; width: 90px; height: 90px; background: var(--glow,#8b7cff); opacity: .07; filter: blur(24px); border-radius: 50%; }
+    .metric-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 12px; }
+    .metric-icon { font-size: 18px; }
+    .metric-number { font-size: 30px; font-weight: 750; letter-spacing: -1px; margin-top: 18px; }
+    .metric-foot { color: var(--muted); font-size: 11px; margin-top: 8px; }
+    .layout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(280px,.85fr); gap: 18px; align-items: start; }
+    .panel { padding: 22px; margin-bottom: 18px; }
+    .panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+    h3 { font-size: 15px; margin: 0; font-weight: 650; }
+    .panel-sub { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .pill { font-size: 10px; padding: 6px 9px; border-radius: 7px; background: #8b7cff17; border: 1px solid #8b7cff35; color: #b7acff; white-space: nowrap; }
+    textarea {
+      display: block; width: 100%; min-height: 180px; resize: vertical;
+      color: #d8def0; background: #090d17; border: 1px solid #2a3248;
+      border-radius: 11px; padding: 16px; outline: none; line-height: 1.8;
+      font-family: "SFMono-Regular", Consolas, monospace; font-size: 12px;
+      transition: border .2s;
+    }
+    textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px #8b7cff12; }
+    textarea::placeholder { color: #66718a; }
+    .editor-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 13px; }
+    .muted { color: var(--muted); font-size: 11px; }
+    .result { display: none; margin-top: 18px; border-top: 1px solid var(--border); padding-top: 18px; }
+    .result.show { display: block; }
+    .result-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .severity { font-size: 11px; font-weight: 750; border-radius: 7px; padding: 7px 10px; background: #43d9a317; color: var(--green); border: 1px solid #43d9a33d; }
+    .severity.high, .severity.critical { color: var(--red); background: #ff648217; border-color: #ff64823d; }
+    .severity.medium { color: var(--yellow); background: #ffca7217; border-color: #ffca723d; }
+    .result-block { margin: 15px 0; }
+    .result-block h4 { color: #a99bff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 7px; }
+    .result-block p, .result-block li { color: #b8c1d7; font-size: 12px; line-height: 1.8; }
+    .result-block p { margin: 0; white-space: pre-wrap; }
+    .result-block ul { padding-left: 19px; margin: 0; }
+    .incident-list { display: grid; gap: 2px; }
+    .incident {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 13px 9px; border-bottom: 1px solid #222a3a; cursor: pointer; border-radius: 7px;
+    }
+    .incident:last-child { border-bottom: 0; }
+    .incident:hover { background: #ffffff06; }
+    .incident-title { font-size: 12px; font-weight: 600; overflow-wrap: anywhere; }
+    .incident-meta { color: var(--muted); font-size: 10px; margin-top: 6px; }
+    .empty { text-align: center; color: var(--muted); padding: 28px 8px; font-size: 12px; line-height: 1.8; }
+    .mini-row { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; margin: 18px 0 9px; }
+    .track { height: 6px; background: #252d40; border-radius: 20px; overflow: hidden; }
+    .fill { height: 100%; border-radius: 20px; width: 0; transition: width .3s; }
+    .notice { display: none; border: 1px solid #ff648255; background: #ff64820c; color: #ff9bad; padding: 12px; border-radius: 9px; font-size: 12px; line-height: 1.6; margin-top: 12px; }
+    .notice.show { display: block; }
+    .view { display: none; }
+    .view.active { display: block; }
+    footer { color: #5e6982; text-align: center; padding: 25px 0 5px; font-size: 10px; }
+    @media (max-width: 1000px) {
+      aside { width: 205px; }
+      .metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 650px) {
+      .app { display: block; }
+      aside { width: 100%; padding: 15px; border-right: 0; border-bottom: 1px solid var(--border); gap: 16px; }
+      .brand { padding: 0 5px; }
+      .nav-label, .side-bottom { display: none; }
+      .nav { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .nav button { justify-content: center; padding: 10px 5px; font-size: 11px; gap: 5px; }
+      main { padding: 22px 15px; }
+      .topbar { margin-bottom: 26px; }
+      .hero { align-items: flex-start; flex-direction: column; }
+      .metrics { gap: 10px; }
+      .metric { padding: 14px; }
+      .metric-number { font-size: 25px; }
+      .panel { padding: 16px; }
+      .profile .user-label { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <div class="brand-icon">⌘</div>
+      <div><h1>OpsMind AI</h1><small>DEVOPS INTELLIGENCE</small></div>
+    </div>
+    <div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav">
+        <button class="active" data-view="overview"><span class="ico">◈</span>Overview</button>
+        <button data-view="analyzer"><span class="ico">⌘</span>Log Analyzer</button>
+        <button data-view="incidents"><span class="ico">≋</span>Incidents</button>
+      </nav>
+    </div>
+    <div class="side-bottom">
+      <div class="nav-label">SYSTEM STATUS</div>
+      <div class="status-card">
+        <div><span class="status-dot" id="sideDot"></span><strong id="sideStatus">Connecting...</strong></div>
+        <p id="sideMessage">Checking your local API connection.</p>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="crumb">Workspace &nbsp;/&nbsp; <span id="crumb">Overview</span></div>
+      <div class="profile">
+        <div class="avatar">AI</div>
+        <div class="user-label"><strong>Incident Assistant</strong><small>Local development</small></div>
+      </div>
+    </div>
+
+    <section class="view active" id="overview">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">INTELLIGENCE AT A GLANCE</div>
+          <h2>Incident Command Center<span style="color:var(--purple)">.</span></h2>
+          <p class="subtitle">Understand your logs. Find root causes. Respond with confidence.<br>AI-powered insights for your DevOps workflow.</p>
+        </div>
+        <button class="btn primary" data-go="analyzer">+ &nbsp; Analyze new log</button>
+      </div>
+
+      <div class="metrics">
+        <div class="metric" style="--glow:#8b7cff">
+          <div class="metric-head">Total incidents <span class="metric-icon">◈</span></div>
+          <div class="metric-number" id="totalCount">—</div>
+          <div class="metric-foot">Saved in your database</div>
+        </div>
+        <div class="metric" style="--glow:#ff6482">
+          <div class="metric-head">Critical alerts <span class="metric-icon">!</span></div>
+          <div class="metric-number" id="criticalCount">—</div>
+          <div class="metric-foot">Critical severity</div>
+        </div>
+        <div class="metric" style="--glow:#ffca72">
+          <div class="metric-head">High severity <span class="metric-icon">↗</span></div>
+          <div class="metric-number" id="highCount">—</div>
+          <div class="metric-foot">High severity</div>
+        </div>
+        <div class="metric" style="--glow:#43d9a3">
+          <div class="metric-head">Other incidents <span class="metric-icon">✓</span></div>
+          <div class="metric-number" id="otherCount">—</div>
+          <div class="metric-foot">Medium, low or unclassified</div>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div>
+          <div class="panel">
+            <div class="panel-heading">
+              <div><h3>Quick log analysis</h3><div class="panel-sub">Paste an error log to start an AI investigation.</div></div>
+              <span class="pill">✦ AI POWERED</span>
+            </div>
+            <textarea id="logInput" spellcheck="false" placeholder="Paste your application logs here...&#10;&#10;Example: ERROR: Connection refused&#10;ERROR: PostgreSQL connection timeout"></textarea>
+            <div class="editor-foot">
+              <span class="muted">Your logs are sent to your configured backend.</span>
+              <button class="btn primary" id="analyzeBtn">✦ &nbsp; Analyze incident</button>
+            </div>
+            <div class="notice" id="analyzeError" role="alert"></div>
+            <div class="result" id="analysisResult" aria-live="polite">
+              <div class="result-top"><h3>Analysis report</h3><span class="severity" id="resultSeverity">UNKNOWN</span></div>
+              <div class="result-block"><h4>Executive summary</h4><p id="resultSummary"></p></div>
+              <div class="result-block"><h4>Likely root cause</h4><p id="resultRoot"></p></div>
+              <div class="result-block"><h4>Possible causes</h4><ul id="resultCauses"></ul></div>
+              <div class="result-block"><h4>Recommended actions</h4><ul id="resultActions"></ul></div>
+              <div class="result-block"><h4>Confidence</h4><p id="resultConfidence"></p></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-heading"><div><h3>Severity overview</h3><div class="panel-sub">Distribution of saved incidents</div></div></div>
+            <div class="mini-row"><span>Critical</span><span id="criticalLabel">0</span></div>
+            <div class="track"><div class="fill" id="criticalBar" style="background:var(--red)"></div></div>
+            <div class="mini-row"><span>High</span><span id="highLabel">0</span></div>
+            <div class="track"><div class="fill" id="highBar" style="background:var(--yellow)"></div></div>
+            <div class="mini-row"><span>Medium / Low / Other</span><span id="otherLabel">0</span></div>
+            <div class="track"><div class="fill" id="otherBar" style="background:var(--green)"></div></div>
+            <div class="muted" style="margin-top:18px">Counts update from your API when available.</div>
+          </div>
+          <div class="panel">
+            <div class="panel-heading"><div><h3>Latest incidents</h3><div class="panel-sub">Your most recent investigations</div></div><button class="btn" id="refreshBtn">↻</button></div>
+            <div class="incident-list" id="recentList"><div class="empty">Connecting to your incident database...</div></div>
+            <button class="btn" data-go="incidents" style="width:100%;margin-top:12px">View all incidents →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="analyzer">
+      <div class="hero"><div><div class="eyebrow">INVESTIGATION WORKSPACE</div><h2>Log Analyzer<span style="color:var(--purple)">.</span></h2><p class="subtitle">Turn raw application logs into actionable troubleshooting insights.</p></div></div>
+      <div class="panel">
+        <div class="panel-heading"><div><h3>Input logs</h3><div class="panel-sub">Provide the error or event logs you want investigated.</div></div><span class="pill">GEMINI AI</span></div>
+        <textarea id="logInput2" spellcheck="false" placeholder="Paste logs here..."></textarea>
+        <div class="editor-foot"><span class="muted">Avoid pasting passwords, API keys or personal data.</span><button class="btn primary" id="analyzeBtn2">✦ &nbsp; Run analysis</button></div>
+        <div class="notice" id="analyzeError2" role="alert"></div>
+        <div id="resultMount2"></div>
+      </div>
+    </section>
+
+    <section class="view" id="incidents">
+      <div class="hero"><div><div class="eyebrow">INVESTIGATION HISTORY</div><h2>All incidents<span style="color:var(--purple)">.</span></h2><p class="subtitle">Review previously analyzed logs and revisit troubleshooting recommendations.</p></div><button class="btn" id="refreshAllBtn">↻ &nbsp; Refresh</button></div>
+      <div class="panel">
+        <div class="panel-heading"><div><h3>Incident history</h3><div class="panel-sub">Select an incident to view its stored analysis.</div></div><span class="pill" id="incidentCountLabel">Loading...</span></div>
+        <div class="incident-list" id="allList"><div class="empty">Loading incidents...</div></div>
+        <div class="notice" id="incidentError" role="alert"></div>
+        <div id="incidentDetail"></div>
+      </div>
+    </section>
+
+    <footer>OpsMind AI INCIDENT INTELLIGENCE &nbsp;·&nbsp; LOCAL DEVELOPMENT BUILD</footer>
+  </main>
+</div>
+
+<script>
+  // Same-origin API: frontend is intended to be served by FastAPI.
+  const API = window.location.protocol === "file:" ? "http://127.0.0.1:8000" : window.location.origin;
+  let incidents = [];
+
+  const $ = id => document.getElementById(id);
+  const asText = value => value == null || value === "" ? "Not provided" :
+    Array.isArray(value) ? value.map(String).join("\n") : String(value);
+
+  function showNotice(id, message) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = message;
+    el.classList.add("show");
+  }
+  function hideNotice(id) {
+    const el = $(id);
+    if (el) { el.textContent = ""; el.classList.remove("show"); }
+  }
+  function setStatus(ok, message) {
+    $("sideStatus").textContent = ok ? "API connected" : "API unavailable";
+    $("sideMessage").textContent = message;
+    $("sideDot").classList.toggle("online", ok);
+  }
+  function getSeverity(item) {
+    return String(item?.severity || item?.analysis?.severity || "UNKNOWN").toUpperCase();
+  }
+  function severityClass(value) {
+    const s = String(value).toLowerCase();
+    if (s.includes("critical")) return "critical";
+    if (s.includes("high")) return "high";
+    if (s.includes("medium")) return "medium";
+    return "";
+  }
+  function safeDate(item) {
+    const value = item?.created_at || item?.timestamp || item?.createdAt || item?.date;
+    if (!value) return "Saved incident";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+  }
+  function titleFor(item) {
+    return item?.summary || item?.root_cause || item?.title ||
+      item?.log?.slice?.(0, 100) || `Incident #${item?.id ?? "—"}`;
+  }
+  function normalizeIncidents(data) {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.incidents)) return data.incidents;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.results)) return data.results;
+    return [];
+  }
+
+  function makeIncidentRow(item) {
+    const row = document.createElement("div");
+    row.className = "incident";
+    const left = document.createElement("div");
+    left.style.minWidth = "0";
+    const title = document.createElement("div");
+    title.className = "incident-title";
+    title.textContent = titleFor(item);
+    const meta = document.createElement("div");
+    meta.className = "incident-meta";
+    meta.textContent = `#${item?.id ?? "—"} · ${safeDate(item)}`;
+    left.append(title, meta);
+    const badge = document.createElement("span");
+    badge.className = `severity ${severityClass(getSeverity(item))}`;
+    badge.textContent = getSeverity(item);
+    row.append(left, badge);
+    if (item?.id != null) row.addEventListener("click", () => loadIncidentDetail(item.id));
+    return row;
+  }
+
+  function renderIncidentList(targetId, list, limit) {
+    const target = $(targetId);
+    target.replaceChildren();
+    const shown = typeof limit === "number" ? list.slice(0, limit) : list;
+    if (!shown.length) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = "No saved incidents yet. Analyze a log to get started.";
+      target.append(empty);
+      return;
+    }
+    shown.forEach(item => target.append(makeIncidentRow(item)));
+  }
+
+  function renderMetrics() {
+    const total = incidents.length;
+    const critical = incidents.filter(x => getSeverity(x) === "CRITICAL").length;
+    const high = incidents.filter(x => getSeverity(x) === "HIGH").length;
+    const other = total - critical - high;
+    $("totalCount").textContent = total;
+    $("criticalCount").textContent = critical;
+    $("highCount").textContent = high;
+    $("otherCount").textContent = other;
+    $("criticalLabel").textContent = critical;
+    $("highLabel").textContent = high;
+    $("otherLabel").textContent = other;
+    const pct = n => total ? `${Math.round(n / total * 100)}%` : "0%";
+    $("criticalBar").style.width = pct(critical);
+    $("highBar").style.width = pct(high);
+    $("otherBar").style.width = pct(other);
+    $("incidentCountLabel").textContent = `${total} incidents`;
+  }
+
+  async function refreshIncidents() {
+    try {
+      const response = await fetch(`${API}/incidents`);
+      if (!response.ok) throw new Error(`API returned HTTP ${response.status}`);
+      const data = await response.json();
+      incidents = normalizeIncidents(data);
+      incidents.sort((a, b) => {
+        const aDate = new Date(a?.created_at || a?.timestamp || 0).getTime() || 0;
+        const bDate = new Date(b?.created_at || b?.timestamp || 0).getTime() || 0;
+        return bDate - aDate;
+      });
+      setStatus(true, "Connected to your FastAPI incident API.");
+      renderMetrics();
+      renderIncidentList("recentList", incidents, 5);
+      renderIncidentList("allList", incidents);
+      $("incidentCountLabel").textContent = `${incidents.length} incidents`;
+      hideNotice("incidentError");
+    } catch (error) {
+      setStatus(false, "Start your FastAPI backend to load saved incidents.");
+      ["totalCount", "criticalCount", "highCount", "otherCount"].forEach(id => $(id).textContent = "—");
+      $("recentList").replaceChildren();
+      $("allList").replaceChildren();
+      const message = document.createElement("div");
+      message.className = "empty";
+      message.textContent = "Cannot reach the API. Start your backend, then click Refresh.";
+      $("recentList").append(message.cloneNode(true));
+      $("allList").append(message);
+      showNotice("incidentError", error.message || "Could not load incidents.");
+    }
+  }
+
+  function fillList(id, values) {
+    const list = $(id);
+    list.replaceChildren();
+    const items = Array.isArray(values) ? values : values ? [values] : [];
+    if (!items.length) {
+      const li = document.createElement("li");
+      li.textContent = "Not provided";
+      list.append(li);
+      return;
+    }
+    items.forEach(value => {
+      const li = document.createElement("li");
+      li.textContent = typeof value === "object" ? JSON.stringify(value) : String(value);
+      list.append(li);
+    });
+  }
+
+  function renderResult(data, mountId) {
+    const result = mountId === "resultMount2" ? $("analysisResult").cloneNode(true) : $("analysisResult");
+    if (mountId === "resultMount2") {
+      result.id = "analysisResult2";
+      result.classList.add("show");
+      $(mountId).replaceChildren(result);
+    } else {
+      result.classList.add("show");
+    }
+    const set = (id, value) => {
+      const el = result.querySelector(`#${id}`) || (result.id !== "analysisResult" ? null : $(id));
+      if (el) el.textContent = asText(value);
+    };
+    const severity = result.querySelector("#resultSeverity");
+    if (severity) {
+      severity.textContent = getSeverity(data);
+      severity.className = `severity ${severityClass(getSeverity(data))}`;
+    }
+    set("resultSummary", data?.summary);
+    set("resultRoot", data?.root_cause);
+    fillListOn(result, "resultCauses", data?.possible_causes);
+    fillListOn(result, "resultActions", data?.recommended_actions);
+    set("resultConfidence", data?.confidence);
+    if (mountId === "resultMount2") $("analysisResult").classList.remove("show");
+  }
+
+  function fillListOn(root, id, values) {
+    const list = root.querySelector(`#${id}`);
+    if (!list) return;
+    list.replaceChildren();
+    const items = Array.isArray(values) ? values : values ? [values] : [];
+    if (!items.length) {
+      const li = document.createElement("li");
+      li.textContent = "Not provided";
+      list.append(li);
+      return;
+    }
+    items.forEach(value => {
+      const li = document.createElement("li");
+      li.textContent = typeof value === "object" ? JSON.stringify(value) : String(value);
+      list.append(li);
+    });
+  }
+
+  async function analyzeLog(inputId, buttonId, noticeId, mountId) {
+    hideNotice(noticeId);
+    const log = $(inputId).value.trim();
+    if (!log) {
+      showNotice(noticeId, "Please paste a log before starting the analysis.");
+      return;
+    }
+    const button = $(buttonId);
+    const oldText = button.textContent;
+    button.disabled = true;
+    button.textContent = "Analyzing...";
+    try {
+      const response = await fetch(`${API}/analyze-log`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ log })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data?.detail || `Analysis failed (HTTP ${response.status})`);
+      const resultData = data?.analysis && typeof data.analysis === "object" ? data.analysis : data;
+      renderResult(resultData, mountId);
+      await refreshIncidents();
+    } catch (error) {
+      showNotice(noticeId, `${error.message || "Analysis failed."} Make sure FastAPI is running and the API key is configured on the backend.`);
+    } finally {
+      button.disabled = false;
+      button.textContent = oldText;
+    }
+  }
+
+  async function loadIncidentDetail(id) {
+    $("incidentDetail").replaceChildren();
+    try {
+      const response = await fetch(`${API}/incidents/${encodeURIComponent(id)}`);
+      if (!response.ok) throw new Error(`Could not load incident #${id} (HTTP ${response.status})`);
+      const data = await response.json();
+      const item = data?.incident || data;
+      const panel = document.createElement("div");
+      panel.className = "result show";
+      const title = document.createElement("h3");
+      title.textContent = `Incident #${id}`;
+      panel.append(title);
+      const severity = document.createElement("p");
+      severity.className = `severity ${severityClass(getSeverity(item))}`;
+      severity.style.display = "inline-block";
+      severity.style.marginTop = "14px";
+      severity.textContent = getSeverity(item);
+      panel.append(severity);
+      const fields = [
+        ["Summary", item?.summary || item?.analysis?.summary],
+        ["Root cause", item?.root_cause || item?.analysis?.root_cause],
+        ["Possible causes", item?.possible_causes || item?.analysis?.possible_causes],
+        ["Recommended actions", item?.recommended_actions || item?.analysis?.recommended_actions],
+        ["Original log", item?.log || item?.original_log],
+        ["Created at", safeDate(item)]
+      ];
+      fields.forEach(([label, value]) => {
+        const block = document.createElement("div");
+        block.className = "result-block";
+        const heading = document.createElement("h4");
+        heading.textContent = label;
+        const text = document.createElement("p");
+        text.textContent = asText(value);
+        block.append(heading, text);
+        panel.append(block);
+      });
+      $("incidentDetail").append(panel);
+    } catch (error) {
+      showNotice("incidentError", error.message || "Unable to load incident.");
+    }
+  }
+
+  function navigate(viewId) {
+    document.querySelectorAll(".view").forEach(el => el.classList.toggle("active", el.id === viewId));
+    document.querySelectorAll("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === viewId));
+    $("crumb").textContent = viewId === "overview" ? "Overview" : viewId === "analyzer" ? "Log Analyzer" : "Incidents";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click", () => navigate(btn.dataset.view)));
+  document.querySelectorAll("[data-go]").forEach(btn => btn.addEventListener("click", () => navigate(btn.dataset.go)));
+  $("analyzeBtn").addEventListener("click", () => analyzeLog("logInput", "analyzeBtn", "analyzeError", "analysisResult"));
+  $("analyzeBtn2").addEventListener("click", () => analyzeLog("logInput2", "analyzeBtn2", "analyzeError2", "resultMount2"));
+  $("refreshBtn").addEventListener("click", refreshIncidents);
+  $("refreshAllBtn").addEventListener("click", refreshIncidents);
+
+  refreshIncidents();
+</script>
+</body>
+</html>
+

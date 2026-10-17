@@ -1,6 +1,9 @@
+
 import json
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -45,12 +48,22 @@ def save_incident(log_text: str, analysis: IncidentAnalysis, db: Session):
     return incident
 
 
-@app.get("/")
+# Serve the modern frontend dashboard.
+@app.get("/", include_in_schema=False)
 def root():
-    return {
-        "message": "AI DevOps Incident Assistant is running!",
-        "status": "healthy",
-    }
+    frontend_file = (
+        Path(__file__).resolve().parent.parent
+        / "frontend"
+        / "index.html"
+    )
+
+    if not frontend_file.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="Frontend file not found. Check frontend/index.html.",
+        )
+
+    return FileResponse(frontend_file, media_type="text/html")
 
 
 @app.get("/health")
@@ -77,7 +90,10 @@ async def analyze_file(
     log_text = content.decode("utf-8", errors="replace")
 
     if not log_text.strip():
-        raise HTTPException(status_code=400, detail="Log file is empty.")
+        raise HTTPException(
+            status_code=400,
+            detail="Log file is empty.",
+        )
 
     analysis = analyze_log(log_text)
     save_incident(log_text, analysis, db)
